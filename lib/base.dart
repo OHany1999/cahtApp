@@ -9,7 +9,7 @@ class BaseViewModel<T extends BaseNavigator> extends ChangeNotifier {
 abstract class BaseNavigator {
   void showLoading({String message});
   void showMessage(String message);
-  void hideDialog();
+  void hideLoading();
 }
 
 // view

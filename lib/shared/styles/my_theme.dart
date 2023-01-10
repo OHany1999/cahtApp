@@ -1,7 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:todo_app/shared/styles/colors.dart';
+
+import 'colors.dart';
 
 class MyTheme {
   static ThemeData lightTheme = ThemeData(

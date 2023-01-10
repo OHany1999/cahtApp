@@ -1,6 +1,8 @@
 import 'package:chat_app/base.dart';
-import 'package:chat_app/screens/create_account/connector.dart';
+import 'package:chat_app/screens/create_account/create_account_navigator.dart';
 import 'package:chat_app/screens/create_account/create_account_vm.dart';
+import 'package:chat_app/screens/home_screen/home_screen.dart';
+import 'package:chat_app/screens/login/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,7 +14,9 @@ class CreateAccountScreen extends StatefulWidget {
   State<CreateAccountScreen> createState() => _CreateAccountScreenState();
 }
 
-class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccountViewModel>{
+class _CreateAccountScreenState
+    extends BaseView<CreateAccountScreen, CreateAccountViewModel>
+    implements CreateAccountNavigator {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   var firstNameController = TextEditingController();
@@ -25,12 +29,17 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
 
   var passwordController = TextEditingController();
 
-
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    viewModel.navigator = this;
+  }
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (context)=> viewModel,
+      create: (context) => viewModel,
       child: Stack(
         children: [
           Image.asset(
@@ -58,8 +67,8 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     TextFormField(
-                      validator: (text){
-                        if(text == null || text.isEmpty){
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
                           return 'please Enter FirstName';
                         }
                         return null;
@@ -81,8 +90,8 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                       height: 10.0,
                     ),
                     TextFormField(
-                      validator: (text){
-                        if(text == null || text.isEmpty){
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
                           return 'please Enter LastName';
                         }
                         return null;
@@ -104,8 +113,8 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                       height: 10.0,
                     ),
                     TextFormField(
-                      validator: (text){
-                        if(text == null || text.isEmpty){
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
                           return 'please Enter UserName';
                         }
                         return null;
@@ -128,11 +137,13 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                     ),
                     TextFormField(
                       keyboardType: TextInputType.emailAddress,
-                      validator: (text){
-                        bool emailValid = RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+").hasMatch(text!);
+                      validator: (text) {
+                        bool emailValid = RegExp(
+                                r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                            .hasMatch(text!);
                         if (text == null || text.isEmpty) {
                           return 'Please Enter Email Address';
-                        }else if (emailValid == false){
+                        } else if (emailValid == false) {
                           return 'Please Enter Valid Email Address';
                         }
                         return null;
@@ -156,8 +167,8 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                     TextFormField(
                       obscureText: true,
                       keyboardType: TextInputType.visiblePassword,
-                      validator: (text){
-                        if(text == null || text.isEmpty){
+                      validator: (text) {
+                        if (text == null || text.isEmpty) {
                           return 'please Enter Password';
                         }
                         return null;
@@ -182,7 +193,18 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
                       onPressed: () {
                         createAccount();
                       },
-                      child: Text('Create Account',),
+                      child: Text(
+                        'Create Account',
+                      ),
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    InkWell(
+                      onTap: (){
+                        viewModel.navigator!.goToLoginScreen();
+                      },
+                      child: Text("IHave Have An Account "),
                     ),
                   ],
                 ),
@@ -194,22 +216,34 @@ class _CreateAccountScreenState extends BaseView<CreateAccountScreen,CreateAccou
     );
   }
 
-  void createAccount()async{
-    if(formKey.currentState!.validate()){
-      viewModel.createAccountAndPassword(email: emailController.text, password: passwordController.text);
+  void createAccount() async {
+    if (formKey.currentState!.validate()) {
+      viewModel.createAccountAndPassword(
+          email: emailController.text,
+        password: passwordController.text,
+        FirstName: firstNameController.text,
+        LastName: lastNameController.text,
+        UserName: userNameController.text,
+      );
       formKey.currentState!.reset();
     }
   }
-
-
 
   @override
   CreateAccountViewModel initViewModel() {
     return CreateAccountViewModel();
   }
 
+
   @override
-  void hideDialog() {
-    // TODO: implement hideDialog
+  void goToHome() {
+    // TODO: implement goToHome
+    Navigator.pushNamedAndRemoveUntil(context,HomeScreen.routeName,(route) => false,);
+  }
+
+  @override
+  void goToLoginScreen() {
+    // TODO: implement goToLoginScreen
+    Navigator.pushNamedAndRemoveUntil(context,LoginScreen.routeName,(route) => false,);
   }
 }
