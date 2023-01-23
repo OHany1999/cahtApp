@@ -2,7 +2,7 @@ import 'package:chat_app/models/my_user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DataBaseUtils {
-  CollectionReference<MyUser> getTaskCollection() {
+  static CollectionReference<MyUser> getTaskCollection() {
     return FirebaseFirestore.instance
         .collection('MyUser')
         .withConverter<MyUser>(
@@ -12,13 +12,13 @@ class DataBaseUtils {
         );
   }
 
-  Future<void> addUsersToFirebase(MyUser myUser) async {
+  static Future<void> addUsersToFirebase(MyUser myUser) async {
 
     return getTaskCollection().doc(myUser.id).set(myUser);
 
   }
 
-  Future<MyUser?> readFromFirebase(String id) async{
+  static Future<MyUser?> readFromFirebase(String id) async{
     DocumentSnapshot<MyUser> userRef = await getTaskCollection().doc(id).get();
     return userRef.data();
   }
