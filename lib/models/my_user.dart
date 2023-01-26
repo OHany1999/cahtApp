@@ -5,12 +5,7 @@ class MyUser {
   String UserName;
   String Email;
 
-  MyUser(
-      {required this.id,
-      required this.fName,
-      required this.lName,
-      required this.UserName,
-      required this.Email});
+  MyUser({required this.id, required this.fName, required this.lName, required this.UserName, required this.Email});
 
 
   Map<String,dynamic> toJson(){
