@@ -21,6 +21,7 @@ class _ChatScreenState extends BaseView<ChatScreen, ChatViewModel>
     implements ChatNavigator {
 
   var messageController= TextEditingController();
+  ScrollController scrollController = ScrollController();
   @override
   void initState() {
     // TODO: implement initState
@@ -42,6 +43,8 @@ class _ChatScreenState extends BaseView<ChatScreen, ChatViewModel>
             width: double.infinity,
             fit: BoxFit.fill,
           ),
+
+
           Scaffold(
             backgroundColor: Colors.transparent,
             appBar: AppBar(
@@ -51,7 +54,7 @@ class _ChatScreenState extends BaseView<ChatScreen, ChatViewModel>
               title: Text(room.RoomName),
             ),
             body: Container(
-              margin: EdgeInsets.symmetric(vertical: 60, horizontal: 18),
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 18),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
@@ -88,6 +91,7 @@ class _ChatScreenState extends BaseView<ChatScreen, ChatViewModel>
                           }
                           List<Message> messageList= snapshot.data!.docs.map((docs) => docs.data()).toList();
                           return ListView.builder(
+                            controller: scrollController,
                             itemCount: messageList.length ,
                               itemBuilder: (context,index){
                               return ChatWidget(messageList[index]);
@@ -129,9 +133,19 @@ class _ChatScreenState extends BaseView<ChatScreen, ChatViewModel>
                           onPressed: () {
                             viewModel.sendMessage(
                                 messageController.text,
-                                room.id,
-                            );
-                            messageController.clear();
+                                room.id,);
+                            try{
+                              messageController.clear();
+                              scrollController.animateTo(
+                                scrollController.position.maxScrollExtent,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            }catch(e){
+                              print(e);
+                            }
+
+
                           },
                           child: Row(
                             children: [

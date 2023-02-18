@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,8 +32,9 @@ class _HomeScreenState extends BaseView<HomeScreen, HomeScreenViewModel>
 
   @override
   Widget build(BuildContext context) {
+    var myId = FirebaseAuth.instance.currentUser?.uid ?? '';
     return ChangeNotifierProvider(
-      create: (context)=>viewModel,
+      create: (context) => viewModel,
       child: Stack(
         children: [
           Image.asset(
@@ -42,33 +44,45 @@ class _HomeScreenState extends BaseView<HomeScreen, HomeScreenViewModel>
             fit: BoxFit.fill,
           ),
           Scaffold(
-              //بيثبت الwidgets عشان متطلعش لفوق في حالة فتح الkeybord
-              resizeToAvoidBottomInset: false,
+            //بيثبت الwidgets عشان متطلعش لفوق في حالة فتح الkeybord
+            resizeToAvoidBottomInset: false,
+            backgroundColor: Colors.transparent,
+            floatingActionButton: FloatingActionButton(
+              onPressed: () {
+                Navigator.pushNamed(context, AddRoomScreen.routeName);
+              },
+              child: Icon(Icons.add),
+            ),
+            appBar: AppBar(
+              centerTitle: true,
               backgroundColor: Colors.transparent,
-              floatingActionButton: FloatingActionButton(
-                onPressed: (){
-                  Navigator.pushNamed(context, AddRoomScreen.routeName);
+              elevation: 0.0,
+              leading: IconButton(
+                onPressed: () async {
+                  viewModel.navigator!.showMessage(myId);
+                  Clipboard.setData(new ClipboardData(text: myId)).then((_){
+                    ScaffoldMessenger.of(context)
+                        .showSnackBar(SnackBar(content: Text('Copied to your clipboard !')));
+                  });
                 },
-                child: Icon(Icons.add),
+                icon: Icon(Icons.mark_unread_chat_alt_sharp),
               ),
-              appBar: AppBar(
-                centerTitle: true,
-                backgroundColor: Colors.transparent,
-                elevation: 0.0,
-                title: Text('Chat App'),
-                actions: [
-                  IconButton(
-                    onPressed: ()async{
-                      FirebaseAuth.instance.signOut();
-                      final prefs = await SharedPreferences.getInstance();
-                      prefs.clear();
-                      goToSignInScreen();
-                  }, icon: Icon(Icons.exit_to_app),),
-                ],
-              ),
+              title: Text('Chat App'),
+              actions: [
+                IconButton(
+                  onPressed: () async {
+                    FirebaseAuth.instance.signOut();
+                    final prefs = await SharedPreferences.getInstance();
+                    prefs.clear();
+                    goToSignInScreen();
+                  },
+                  icon: Icon(Icons.exit_to_app),
+                ),
+              ],
+            ),
             body: StreamBuilder<QuerySnapshot<Room>>(
               stream: DataBaseUtils.getRoomFromFireStore(),
-              builder: (context,snapshot){
+              builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return Center(child: Container());
                 }
@@ -85,7 +99,8 @@ class _HomeScreenState extends BaseView<HomeScreen, HomeScreenViewModel>
                     ),
                   );
                 }
-                List<Room> roomList =snapshot.data!.docs.map((doc) => doc.data()).toList();
+                List<Room> roomList =
+                    snapshot.data!.docs.map((doc) => doc.data()).toList();
                 return Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: GridView.builder(
@@ -94,8 +109,14 @@ class _HomeScreenState extends BaseView<HomeScreen, HomeScreenViewModel>
                       mainAxisSpacing: 16,
                       crossAxisSpacing: 16,
                     ),
-                    itemBuilder: (context,index){
-                      return RoomWidget(roomList[index]);
+                    itemBuilder: (context, index) {
+                      if (roomList[index].createdGroupId == myId ||
+                          roomList[index].receiverId == myId) {
+                        return RoomWidget(roomList[index]);
+                      } else {
+                        return Container();
+                      }
+
                     },
                     itemCount: roomList.length,
                   ),
@@ -116,6 +137,7 @@ class _HomeScreenState extends BaseView<HomeScreen, HomeScreenViewModel>
   @override
   void goToSignInScreen() {
     // TODO: implement goToSignInScreen
-    Navigator.pushNamedAndRemoveUntil(context, LoginScreen.routeName, (route) => false);
+    Navigator.pushNamedAndRemoveUntil(
+        context, LoginScreen.routeName, (route) => false);
   }
 }

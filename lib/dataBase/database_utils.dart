@@ -16,12 +16,12 @@ class DataBaseUtils {
         );
   }
 
+  //for create account
   static Future<void> addUsersToFirebase(MyUser myUser){
-
     return getTaskCollection().doc(myUser.id).set(myUser);
-
   }
 
+  // for login
   static Future<MyUser?> readFromFirebase(String id) async{
     DocumentSnapshot<MyUser> userRef = await getTaskCollection().doc(id).get();
     return userRef.data();
@@ -49,6 +49,9 @@ class DataBaseUtils {
     var data= getRoomsCollection().orderBy('dateTime').snapshots();
     return data;
   }
+  static void deleteRoomFromFirebase(String roomId){
+   getRoomsCollection().doc(roomId).delete();
+  }
 
   //----------------------------------------------------
 
@@ -68,5 +71,12 @@ class DataBaseUtils {
   static Stream<QuerySnapshot<Message>> readMessages(String roomId){
     return getMessageCollection(roomId).orderBy('dateTime').snapshots();
   }
+  static void deleteMessageFromFirebase(String roomId,String messageId){
+    getMessageCollection(roomId).doc(messageId).delete();
+  }
+
+
+  //-----------------------------------------------------
+
 
 }

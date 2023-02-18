@@ -18,6 +18,7 @@ class _AddRoomScreenState extends BaseView<AddRoomScreen, AddRoomViewModel>
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
   var roomNameController = TextEditingController();
   var roomDescriptionController = TextEditingController();
+  var groupLinkController = TextEditingController();
   var categories= RoomCategory.getCategories();
   late RoomCategory roomCategory = categories.first;
 
@@ -141,6 +142,29 @@ class _AddRoomScreenState extends BaseView<AddRoomScreen, AddRoomViewModel>
                       SizedBox(
                         height: 10.0,
                       ),
+                      TextFormField(
+                        controller: groupLinkController,
+                        validator: (text) {
+                          if (text == null || text.isEmpty) {
+                            return 'Please enter Other User Id ';
+                          }
+                          return null;
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Your Friend Id',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.blue),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.blue),
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 10.0,
+                      ),
                       ElevatedButton(
                         onPressed: () {
                           if(formKey.currentState!.validate()){
@@ -148,6 +172,7 @@ class _AddRoomScreenState extends BaseView<AddRoomScreen, AddRoomViewModel>
                                 roomNameController.text,
                                 roomDescriptionController.text,
                                 roomCategory.name,
+                              groupLinkController.text,
                             );
                             RoomCreated();
                           }

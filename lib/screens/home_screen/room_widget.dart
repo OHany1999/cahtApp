@@ -1,7 +1,9 @@
+import 'package:chat_app/dataBase/database_utils.dart';
 import 'package:chat_app/screens/chat/chat_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/room_models/room.dart';
+import '../../shared/components/ui_utils.dart';
 
 class RoomWidget extends StatelessWidget {
 Room room;
@@ -9,6 +11,20 @@ RoomWidget(this.room);
   @override
   Widget build(BuildContext context) {
     return InkWell(
+      onLongPress: (){
+        showMessage(
+            'delete message',
+            context,
+            'ok',
+                () {
+              DataBaseUtils.deleteRoomFromFirebase(room.id);
+              hideLoading(context);
+            },
+            negBtn: 'cancel',
+            negAction: () {
+              hideLoading(context);
+            });
+      },
       onTap: (){
         Navigator.pushNamed(context, ChatScreen.routeName,arguments: room);
       },

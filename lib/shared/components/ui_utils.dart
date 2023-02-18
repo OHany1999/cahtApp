@@ -24,7 +24,10 @@ void showMessage(
     BuildContext context
     ,String posBtn,
     VoidCallback posAction,
-    {String? negBtn, VoidCallback? negAction,}
+    {
+      String? negBtn,
+      VoidCallback? negAction,
+    }
     ){
   showDialog(context: context, builder: (context){
     List<Widget>actions=[
